@@ -7,7 +7,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -23,9 +25,13 @@ public class MainMenu implements Screen {
     private OrthographicCamera camera;
     private Viewport viewport;
     private Stage stage;
+    private Stage stagebg;
     private Vector2 btnSize;
     private Texture background = new Texture("bg.jpg");
     private Texture playbtn = new Texture("playbtn.png");
+    private Texture settingsbtn = new Texture("settingsbtn.png");
+    private Texture shopbtn = new Texture("shopbtn.png");
+
     private MainC mc;
     public MainMenu(MainC mainC){
         mc = mainC;
@@ -37,28 +43,40 @@ public class MainMenu implements Screen {
         camera.setToOrtho(false);
         viewport = new ExtendViewport(MainC.WIDTH, MainC.HEIGHT, camera);
         stage = new Stage(viewport);
+        stagebg = new Stage(viewport);
 
         btnSize = new Vector2(300, 300);
 
         Button startBtn = new Button(new SpriteDrawable(new Sprite(playbtn)));
-        //startBtn.setBounds(MainC.WIDTH/2 - btnSize.x/2 , btnSize.x / 2, btnSize.y / 2);
+        Button settingsBtn = new Button(new SpriteDrawable(new Sprite(settingsbtn)));
+        Button shopBtn = new Button(new SpriteDrawable(new Sprite(shopbtn)));
+
+        startBtn.setBounds((MainC.WIDTH/2) - (btnSize.x / 4), MainC.HEIGHT/ 7*2, btnSize.x / 2, btnSize.y / 2);
+        settingsBtn.setBounds(MainC.WIDTH / 2  /*btnSize.x / 4 - btnSize.x / 4*/, MainC.HEIGHT / 7 * 2 - btnSize.y * 9 / 30, btnSize.x/4, btnSize.y /4);
+        shopBtn.setBounds(MainC.WIDTH / 2 - btnSize.x / 4, MainC.HEIGHT / 7 * 2 - btnSize.y * 9 / 30, btnSize.x/4, btnSize.y /4);
 
         startBtn.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 mc.setScreen(mc.playScreen);
-                //TODO check this (was loadingScreen)
                 return super.touchDown(event, x, y, pointer, button);
             }
         });
-
         stage.addActor(startBtn);
+        stage.addActor(settingsBtn);
+        stage.addActor(shopBtn);
+
+
         Gdx.input.setInputProcessor(stage);
     }
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        stage.getBatch().begin();
+        stage.getBatch().draw(background);
+        stage.getBatch().end();
 
         stage.act();
         stage.draw();

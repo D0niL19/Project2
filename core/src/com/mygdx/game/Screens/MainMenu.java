@@ -27,10 +27,9 @@ public class MainMenu implements Screen {
     private Texture background = new Texture("bg.jpg");
     private Texture playbtn = new Texture("playbtn.png");
     private MainC mc;
-//    public MainMenu(MainMenu mainC){
-//
-//    }
-
+    public MainMenu(MainC mainC){
+        mc = mainC;
+    }
 
     @Override
     public void show() {
@@ -42,12 +41,12 @@ public class MainMenu implements Screen {
         btnSize = new Vector2(300, 300);
 
         Button startBtn = new Button(new SpriteDrawable(new Sprite(playbtn)));
-        startBtn.setBounds(0 ,0, btnSize.x / 2, btnSize.y / 2);
+        //startBtn.setBounds(MainC.WIDTH/2 - btnSize.x/2 , btnSize.x / 2, btnSize.y / 2);
 
         startBtn.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                mc.setScreen(mc.lobbyListScreen);
+                mc.setScreen(mc.playScreen);
                 //TODO check this (was loadingScreen)
                 return super.touchDown(event, x, y, pointer, button);
             }

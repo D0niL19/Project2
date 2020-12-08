@@ -1,0 +1,101 @@
+package com.mygdx.game.Screens;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.NinePatch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.NinePatchDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.SpriteDrawable;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mygdx.game.MainC;
+
+public class MainMenu implements Screen {
+    private OrthographicCamera camera;
+    private Viewport viewport;
+    private Stage stage;
+    private Vector2 btnSize;
+    private Texture background = new Texture("bg.jpg");
+    private Texture playbtn = new Texture("playbtn.png");
+    private MainC mc;
+//    public MainMenu(MainMenu mainC){
+//
+//    }
+
+
+    @Override
+    public void show() {
+        camera = new OrthographicCamera();
+        camera.setToOrtho(false);
+        viewport = new ExtendViewport(MainC.WIDTH, MainC.HEIGHT, camera);
+        stage = new Stage(viewport);
+
+        btnSize = new Vector2(300, 300);
+
+        Button startBtn = new Button(new SpriteDrawable(new Sprite(playbtn)));
+        startBtn.setBounds(0 ,0, btnSize.x / 2, btnSize.y / 2);
+
+        startBtn.addListener(new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                mc.setScreen(mc.lobbyListScreen);
+                //TODO check this (was loadingScreen)
+                return super.touchDown(event, x, y, pointer, button);
+            }
+        });
+
+        stage.addActor(startBtn);
+        Gdx.input.setInputProcessor(stage);
+    }
+    @Override
+    public void render(float delta) {
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        stage.act();
+        stage.draw();
+    }
+    @Override
+    public void resize(int width, int height) {
+//        stage.getViewport().setScreenSize(width, height);
+    }
+
+    @Override
+    public void pause() {
+
+    }
+
+    @Override
+    public void resume() {
+
+    }
+
+    @Override
+    public void hide() {
+
+    }
+
+    @Override
+    public void dispose() {
+        stage.dispose();
+    }
+
+    private NinePatch getScaledNinePatch(Texture texture, int left, int right, int top, int bottom) {
+        NinePatch ninePatch = new NinePatch(texture, left, right, top, bottom);
+        float scaleX = btnSize.x / texture.getWidth();
+        float scaleY = btnSize.y / texture.getHeight();
+        float scale = scaleX > scaleY ? scaleY : scaleX;
+        ninePatch.scale(scale, scale);
+        return ninePatch;
+    }
+
+}

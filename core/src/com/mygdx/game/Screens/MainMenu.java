@@ -31,6 +31,8 @@ public class MainMenu implements Screen {
     private Texture playbtn = new Texture("playbtn.png");
     private Texture settingsbtn = new Texture("settingsbtn.png");
     private Texture shopbtn = new Texture("shopbtn.png");
+    private Texture icon = new Texture("icosahedron.png");
+    private Texture IntroText = new Texture("IntroText.png");
 
     private MainC mc;
     public MainMenu(MainC mainC){
@@ -45,15 +47,15 @@ public class MainMenu implements Screen {
         stage = new Stage(viewport);
         stagebg = new Stage(viewport);
 
-        btnSize = new Vector2(300, 300);
+        btnSize = new Vector2(178, 178);
 
         Button startBtn = new Button(new SpriteDrawable(new Sprite(playbtn)));
         Button settingsBtn = new Button(new SpriteDrawable(new Sprite(settingsbtn)));
         Button shopBtn = new Button(new SpriteDrawable(new Sprite(shopbtn)));
 
-        startBtn.setBounds((MainC.WIDTH/2) - (btnSize.x / 4), MainC.HEIGHT/ 7*2, btnSize.x / 2, btnSize.y / 2);
-        settingsBtn.setBounds(MainC.WIDTH / 2  /*btnSize.x / 4 - btnSize.x / 4*/, MainC.HEIGHT / 7 * 2 - btnSize.y * 9 / 30, btnSize.x/4, btnSize.y /4);
-        shopBtn.setBounds(MainC.WIDTH / 2 - btnSize.x / 4, MainC.HEIGHT / 7 * 2 - btnSize.y * 9 / 30, btnSize.x/4, btnSize.y /4);
+        startBtn.setBounds((MainC.WIDTH/2) - playbtn.getWidth()/ 2 , MainC.HEIGHT/ 7*2, btnSize.x , btnSize.y);
+        settingsBtn.setBounds(MainC.WIDTH / 2 - settingsbtn.getWidth() + playbtn.getWidth() / 2, MainC.HEIGHT / 7 * 2 - settingsbtn.getHeight(), 78, 78);
+        shopBtn.setBounds(MainC.WIDTH / 2 - playbtn.getWidth() / 2, MainC.HEIGHT / 7 * 2 - shopbtn.getHeight() , 78, 78);
 
         startBtn.addListener(new ClickListener() {
             @Override
@@ -75,7 +77,9 @@ public class MainMenu implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         stage.getBatch().begin();
-        //stage.getBatch().draw(background);
+        stage.getBatch().draw(background, 0,0);
+        stage.getBatch().draw(icon, MainC.WIDTH /2 - icon.getWidth() / 2  , MainC.HEIGHT / 5 * 3);
+        stage.getBatch().draw(IntroText, MainC.WIDTH / 2 - IntroText.getWidth() / 2, MainC.HEIGHT / 5 * 4);
         stage.getBatch().end();
 
         stage.act();

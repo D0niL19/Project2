@@ -77,7 +77,7 @@ public class MainMenu implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         stage.getBatch().begin();
-        stage.getBatch().draw(background, 0,0);
+        stage.getBatch().draw(background, 0,0, 480, 800);
         stage.getBatch().draw(icon, MainC.WIDTH /2 - icon.getWidth() / 2  , MainC.HEIGHT / 5 * 3);
         stage.getBatch().draw(IntroText, MainC.WIDTH / 2 - IntroText.getWidth() / 2, MainC.HEIGHT / 5 * 4);
         stage.getBatch().end();

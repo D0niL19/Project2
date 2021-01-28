@@ -4,6 +4,7 @@ import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -28,6 +29,8 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.mygdx.game.Assets;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class PlayScreen implements Screen {
     private ModelBatch mbatch;
@@ -41,8 +44,33 @@ public class PlayScreen implements Screen {
 
     private CameraInputController controll;
     private Environment env;
+    private String change;
+
+
+
     @Override
     public void show() {
+        //--------------------------------------RANDOM
+        List<Integer> arr = new ArrayList<>();
+        ArrayList Location_Images = new ArrayList();
+        Location_Images.add(-1);
+        Location_Images.add("Cubes/one.png");
+        Location_Images.add("Cubes/two.png");
+        Location_Images.add("Cubes/three.png");
+        Location_Images.add("Cubes/four.png");
+        Location_Images.add("Cubes/five.png");
+        Location_Images.add("Cubes/six.png");
+        for (int i = 1; i <= 6; i++) {
+            arr.add(i);
+        }
+        Collections.shuffle(arr);
+        Integer[] shuffledArray = arr.toArray(new Integer[0]);
+        arr.add(-1);
+        Collections.reverse(arr);
+
+        //--------------------------------------RANDOM
+
+
         env = new Environment();
         env.set(new ColorAttribute(ColorAttribute.AmbientLight, .4f, .4f, .4f, 1f));
         env.add(new DirectionalLight().set(Color.WHITE, -.1f, -1f, -.1f));
@@ -61,35 +89,18 @@ public class PlayScreen implements Screen {
 
         Gdx.input.setInputProcessor(controll);
 
-//        ObjLoader loader = new ObjLoader();
-//        model = new ModelInstance(loader.loadModel(Gdx.files.internal("cube_with_texture.obj")));
-//        model.transform.scl(1.5f);
-//        model.getMaterial("Материал").clear();
-        //model.getMaterial("Материал.004").set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("one.png")));
-
-
-//        assets = new AssetManager();
-//        assets.load("Cubes/abc.g3dj", Model.class);
-//        loading = true;
-//        //Model cube = assets.get("Cube_g3db.g3db", Model.class);
-//    }
-//    public void doneLoading(){
-//        Model ship = assets.get("Cubes/abc.g3dj", Model.class);
-//        ModelInstance shipInstance = new ModelInstance(ship);
-//        instances.add(shipInstance);
-//        loading = false;
-
         // D3DJ ------------------------------------------------------
         G3dModelLoader modelLoader = new G3dModelLoader(new JsonReader());
-        Model model1 = modelLoader.loadModel(Gdx.files.getFileHandle("Cubes/twot5.g3dj", Files.FileType.Internal));
+        Model model1 = modelLoader.loadModel(Gdx.files.getFileHandle("Cubes/Ready.g3dj", Files.FileType.Internal));
         ModelInstance modelInstance1 = new ModelInstance(model1);
         instances.add(modelInstance1);
 
+        for (int i = 1; i <= 6; i++) {
 
-        //modelInstance1.transform.setTranslation(5.0f, 0.0f, 0.0f);
-        instances.get(0).getMaterial("Material").set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("Cubes/one.png")));
+            instances.get(0).getMaterial("Mat" + arr.get(i) ).clear();
+            instances.get(0).getMaterial("Mat" + arr.get(i)).set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(i))));
+        }
 
-        // ------------------------------------------------------------
 
 
     }

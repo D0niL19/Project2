@@ -2,16 +2,15 @@ package com.mygdx.game.Screens;
 
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.TextureData;
 import com.badlogic.gdx.graphics.g3d.Environment;
-import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
@@ -20,37 +19,62 @@ import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
-import com.badlogic.gdx.graphics.g3d.loader.ObjLoader;
 import com.badlogic.gdx.graphics.g3d.model.Node;
-import com.badlogic.gdx.graphics.g3d.model.NodePart;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
+import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
+import com.badlogic.gdx.math.collision.Ray;
+import com.badlogic.gdx.physics.bullet.Bullet;
+import com.badlogic.gdx.physics.bullet.DebugDrawer;
+import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
+import com.badlogic.gdx.physics.bullet.collision.btBroadphaseInterface;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
+import com.badlogic.gdx.physics.bullet.collision.btDbvtBroadphase;
+import com.badlogic.gdx.physics.bullet.collision.btDefaultCollisionConfiguration;
+import com.badlogic.gdx.physics.bullet.collision.btDispatcher;
+import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver;
+import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
+import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld;
+import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
-import com.mygdx.game.Assets;
-
+import com.mygdx.game.BulletInputProcessor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
 
-public class PlayScreen implements Screen {
+public class PlayScreen implements Screen, InputProcessor {
     private ModelBatch mbatch;
     private PerspectiveCamera camera;
     private ModelInstance model;
-    private ArrayList <ModelInstance> models;
-
     public Array<ModelInstance> instances = new Array<ModelInstance>();
-    public boolean loading;
     public AssetManager assets;
 
     private CameraInputController controll;
     private Environment env;
-    private String change;
+    private int count;
 
+
+
+    // RAYCAST---------------------------------------------------
+    public  static btDynamicsWorld world;
+    private btCollisionConfiguration collisioConfig;
+    private btDispatcher dispatcher;
+    private btBroadphaseInterface broadphase;
+    private btConstraintSolver constrainSolver;
+
+    private BoundingBox box = new BoundingBox();
+    // RAYCAST---------------------------------------------------
 
 
     @Override
     public void show() {
-        //--------------------------------------RANDOM
+
+        // RANDOM--------------------------------------
         List<Integer> arr = new ArrayList<>();
         ArrayList Location_Images = new ArrayList();
         Location_Images.add(-1);
@@ -68,26 +92,47 @@ public class PlayScreen implements Screen {
         arr.add(-1);
         Collections.reverse(arr);
 
-        //--------------------------------------RANDOM
+        int count = 0;
+
+        // RANDOM--------------------------------------
+
+        // Bullet--------------------------------------
+        Bullet.init();
+         collisioConfig = new btDefaultCollisionConfiguration();
+         dispatcher = new btCollisionDispatcher(collisioConfig);
+         broadphase = new btDbvtBroadphase();
+         constrainSolver = new btSequentialImpulseConstraintSolver();
+
+         world = new btDiscreteDynamicsWorld(dispatcher, broadphase, constrainSolver, collisioConfig);
 
 
+        // Bullet--------------------------------------
+
+        // ENVIRONMENT--------------------------------------
         env = new Environment();
         env.set(new ColorAttribute(ColorAttribute.AmbientLight, .4f, .4f, .4f, 1f));
         env.add(new DirectionalLight().set(Color.WHITE, -.1f, -1f, -.1f));
         env.add(new PointLight().set(Color.BLUE, 0, 0, 0, 5));
 
         mbatch = new ModelBatch();
-
-        camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.position.set(5, 5, 5);
+        // ENVIRONMENT--------------------------------------
+        // CAMERA--------------------------------------
+        camera = new PerspectiveCamera(91, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera.position.set(4, 4, 4);
         camera.lookAt(0, 0, 0);
-        camera.far = 100;
-        camera.near = 0.1f;
+        camera.far = 10;
+        camera.near = 0.01f;
 
         controll = new CameraInputController(camera);
         controll.autoUpdate = true;
+        // CAMERA--------------------------------------
+
+        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(this);
+        inputMultiplexer.addProcessor(controll);
 
         Gdx.input.setInputProcessor(controll);
+
 
         // D3DJ ------------------------------------------------------
         G3dModelLoader modelLoader = new G3dModelLoader(new JsonReader());
@@ -99,23 +144,37 @@ public class PlayScreen implements Screen {
 
             instances.get(0).getMaterial("Mat" + arr.get(i) ).clear();
             instances.get(0).getMaterial("Mat" + arr.get(i)).set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(i))));
+            System.out.println(arr);
         }
-
-
+        //instances.get(0).getMaterial("Mat5").set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("Cubes/badlogic.jpg")));
+        // D3DJ ------------------------------------------------------
 
     }
+
+
 
     @Override
     public void render(float delta) {
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
-
-            //Model cube = assets.get("Cubes/abc.g3dj", Model.class);
-        //camera.update();
         controll.update();
+        if(Gdx.input.justTouched()){
+            Ray ray = camera.getPickRay(Gdx.input.getX(), Gdx.input.getY());
+            count += 1;
+            System.out.println(count);
+            for (int i = 0; i < instances.get(0).getNode("Cube").getChildCount(); i++) {
+
+                Node node = instances.get(0).getNode("Cube").getChild(i);
+                node.calculateBoundingBox(box);
+                if (Intersector.intersectRayBounds(ray, box, null) && count >2) {
+                    node.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("Cubes/badlogic.jpg")));
+                    System.out.println("aaaaaa");
+                    break;
+                }
+            }
+        }
+
 
         mbatch.begin(camera);
-//        model.getNode("Plane2").globalTransform.scl(1.001f);
         mbatch.render(instances,env);
         mbatch.end();
     }
@@ -144,5 +203,57 @@ public class PlayScreen implements Screen {
     public void dispose() {
         instances.clear();
         assets.dispose();
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        /*System.out.println(22);
+        Ray ray = camera.getPickRay(screenX,screenY);
+        for (int i = 0; i < instances.get(0).getNode("Cube").getChildCount(); i++) {
+
+            Node node = instances.get(0).getNode("Cube").getChild(i);
+            node.calculateBoundingBox(box);
+
+            if(Intersector.intersectRayBoundsFast(ray,box)){
+                node.detach();
+            }
+        }*/
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        System.out.println(11);
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(int amount) {
+        return false;
     }
 }

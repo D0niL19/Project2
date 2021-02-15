@@ -34,10 +34,17 @@ public class MainMenu implements Screen {
     private Texture icon = new Texture("icosahedron.png");
     private Texture IntroText = new Texture("IntroText.png");
 
+    public static boolean InGame = false;
+
     private MainC mc;
     public MainMenu(MainC mainC){
         mc = mainC;
     }
+
+    /*public boolean Ingame(boolean g){
+        g = this.InGame;
+        return g;
+    }*/
 
     @Override
     public void show() {
@@ -61,6 +68,7 @@ public class MainMenu implements Screen {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 mc.setScreen(mc.playScreen);
+                InGame = true;
                 return super.touchDown(event, x, y, pointer, button);
             }
         });

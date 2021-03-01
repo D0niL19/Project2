@@ -20,8 +20,10 @@ import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
 import com.badlogic.gdx.graphics.g3d.environment.PointLight;
 import com.badlogic.gdx.graphics.g3d.loader.G3dModelLoader;
 import com.badlogic.gdx.graphics.g3d.model.Node;
+import com.badlogic.gdx.graphics.g3d.model.NodePart;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.math.Intersector;
+import com.badlogic.gdx.math.Plane;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.Ray;
@@ -31,7 +33,9 @@ import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.btBroadphaseInterface;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionConfiguration;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionDispatcher;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionWorld;
 import com.badlogic.gdx.physics.bullet.collision.btDbvtBroadphase;
 import com.badlogic.gdx.physics.bullet.collision.btDefaultCollisionConfiguration;
 import com.badlogic.gdx.physics.bullet.collision.btDispatcher;
@@ -42,7 +46,9 @@ import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSol
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.mygdx.game.BulletInputProcessor;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
@@ -58,16 +64,14 @@ public class PlayScreen implements Screen, InputProcessor {
     private Environment env;
     private int count;
 
-
-
     // RAYCAST---------------------------------------------------
-    public  static btDynamicsWorld world;
+    public static btDynamicsWorld world;
     private btCollisionConfiguration collisioConfig;
     private btDispatcher dispatcher;
     private btBroadphaseInterface broadphase;
     private btConstraintSolver constrainSolver;
 
-    private BoundingBox box = new BoundingBox();
+    private BoundingBox box;
     // RAYCAST---------------------------------------------------
 
 
@@ -98,12 +102,12 @@ public class PlayScreen implements Screen, InputProcessor {
 
         // Bullet--------------------------------------
         Bullet.init();
-         collisioConfig = new btDefaultCollisionConfiguration();
-         dispatcher = new btCollisionDispatcher(collisioConfig);
-         broadphase = new btDbvtBroadphase();
-         constrainSolver = new btSequentialImpulseConstraintSolver();
+        collisioConfig = new btDefaultCollisionConfiguration();
+        dispatcher = new btCollisionDispatcher(collisioConfig);
+        broadphase = new btDbvtBroadphase();
+        constrainSolver = new btSequentialImpulseConstraintSolver();
 
-         world = new btDiscreteDynamicsWorld(dispatcher, broadphase, constrainSolver, collisioConfig);
+        world = new btDiscreteDynamicsWorld(dispatcher, broadphase, constrainSolver, collisioConfig);
 
 
         // Bullet--------------------------------------
@@ -117,23 +121,21 @@ public class PlayScreen implements Screen, InputProcessor {
         mbatch = new ModelBatch();
         // ENVIRONMENT--------------------------------------
         // CAMERA--------------------------------------
-        camera = new PerspectiveCamera(91, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        camera.position.set(4, 4, 4);
+        camera = new PerspectiveCamera(67, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        camera.position.set(-2, 2, 2);
         camera.lookAt(0, 0, 0);
-        camera.far = 10;
+        camera.far = 100;
         camera.near = 0.01f;
 
         controll = new CameraInputController(camera);
         controll.autoUpdate = true;
+
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(this);
+        multiplexer.addProcessor(controll);
+
+        Gdx.input.setInputProcessor(multiplexer);
         // CAMERA--------------------------------------
-
-        InputMultiplexer inputMultiplexer = new InputMultiplexer();
-        inputMultiplexer.addProcessor(this);
-        inputMultiplexer.addProcessor(controll);
-
-        Gdx.input.setInputProcessor(controll);
-
-
         // D3DJ ------------------------------------------------------
         G3dModelLoader modelLoader = new G3dModelLoader(new JsonReader());
         Model model1 = modelLoader.loadModel(Gdx.files.getFileHandle("Cubes/Ready.g3dj", Files.FileType.Internal));
@@ -142,40 +144,25 @@ public class PlayScreen implements Screen, InputProcessor {
 
         for (int i = 1; i <= 6; i++) {
 
-            instances.get(0).getMaterial("Mat" + arr.get(i) ).clear();
+            instances.get(0).getMaterial("Mat" + arr.get(i)).clear();
             instances.get(0).getMaterial("Mat" + arr.get(i)).set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(i))));
             System.out.println(arr);
         }
-        //instances.get(0).getMaterial("Mat5").set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("Cubes/badlogic.jpg")));
+        instances.get(0).getNode("Cube").getChild(5);
         // D3DJ ------------------------------------------------------
 
+        box = new BoundingBox();
     }
-
 
 
     @Override
     public void render(float delta) {
         Gdx.gl20.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+        camera.update();
         controll.update();
-        if(Gdx.input.justTouched()){
-            Ray ray = camera.getPickRay(Gdx.input.getX(), Gdx.input.getY());
-            count += 1;
-            System.out.println(count);
-            for (int i = 0; i < instances.get(0).getNode("Cube").getChildCount(); i++) {
-
-                Node node = instances.get(0).getNode("Cube").getChild(i);
-                node.calculateBoundingBox(box);
-                if (Intersector.intersectRayBounds(ray, box, null) && count >2) {
-                    node.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("Cubes/badlogic.jpg")));
-                    System.out.println("aaaaaa");
-                    break;
-                }
-            }
-        }
-
 
         mbatch.begin(camera);
-        mbatch.render(instances,env);
+        mbatch.render(instances, env);
         mbatch.end();
     }
 
@@ -222,23 +209,78 @@ public class PlayScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        /*System.out.println(22);
-        Ray ray = camera.getPickRay(screenX,screenY);
-        for (int i = 0; i < instances.get(0).getNode("Cube").getChildCount(); i++) {
+//        Ray ray = camera.getPickRay(camera.unproject(new Vector3(screenX, screenY, 0)).x, camera.unproject(new Vector3(screenX, screenY, 0)).y);
+        Ray ray = camera.getPickRay(screenX, screenY);
+//        count += 1;
+//        System.out.println(count);
+//        for (int i = 0; i < instances.get(0).getNode("Cube").getChildCount(); i++) {
+//            Node node = instances.get(0).getNode("Cube").getChild(i);
+//            if (Intersector.intersectRayBoundsFast(ray, box) && count > 2) {
+//                node.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("Cubes/badlogic.jpg")));
+//                System.out.println(instances.get(0).getNode("Cube").getChild(i).id);
+//                return false;
+//            }
 
-            Node node = instances.get(0).getNode("Cube").getChild(i);
-            node.calculateBoundingBox(box);
+//        }
 
-            if(Intersector.intersectRayBoundsFast(ray,box)){
-                node.detach();
-            }
-        }*/
+        Plane plane1 = new Plane(new Vector3(1, 0, 0), new Vector3(1, 0, 0));
+        Plane plane2 = new Plane(new Vector3(0, 0, 1), new Vector3(0, 0, 1));
+        Plane plane3 = new Plane(new Vector3(-1, 0, 0), new Vector3(-1, 0, 0));
+        Plane plane4 = new Plane(new Vector3(0, 0, -1), new Vector3(0, 0, -1));
+        Plane plane5 = new Plane(new Vector3(0, 1, 0), new Vector3(0, 1, 0));
+        Plane plane6 = new Plane(new Vector3(0, -1, 0), new Vector3(0, -1, 0));
+        Vector3 intersection = new Vector3();
+        BoundingBox boundingBox = new BoundingBox(new Vector3(-0.5f, -1, -0.5f), new Vector3(0.5f, -1, 0.5f));
+        BoundingBox boundingBox2 = new BoundingBox(new Vector3(-0.5f, 1, -0.5f), new Vector3(0.5f, 1, 0.5f));
+
+        if(Intersector.intersectRayBoundsFast(ray, boundingBox))
+            System.out.println("Box");
+        else if(Intersector.intersectRayBoundsFast(ray, boundingBox2))
+            System.out.println("Box 2");
+
+        if (Intersector.intersectRayPlane(ray, plane1, intersection)) {
+            System.out.println("plane1" + intersection);
+            return false;
+        }
+        if (Intersector.intersectRayPlane(ray, plane2, intersection)) {
+            System.out.println("plane2" + intersection);
+            return false;
+        }
+        if (Intersector.intersectRayPlane(ray, plane3, intersection)) {
+            System.out.println("plane3" + intersection);
+            return false;
+        }
+        if (Intersector.intersectRayPlane(ray, plane4, intersection)) {
+            System.out.println("plane4" + intersection);
+            return false;
+        }
+        if (Intersector.intersectRayPlane(ray, plane5, intersection)) {
+            System.out.println("plane5" + intersection);
+            return false;
+        }
+        if (Intersector.intersectRayPlane(ray, plane6, intersection)) {
+            System.out.println("plane6" + intersection);
+            return false;
+        }
+
+//        Vector3 position = new Vector3();
+//        Vector3 dimensions = new Vector3();
+//        Ray ray = camera.getPickRay(screenX, screenY);
+//        for (int i = 0; i < instances.size; i++) {
+//            ModelInstance instance = instances.get(i);
+//            instance.getNode("Cube").calculateBoundingBox(box);
+//            instance.getNode("Cube").getTranslation(position);
+//            if (Intersector.intersectRayBoundsFast(ray, position, box.getDimensions(dimensions))) {
+//                System.out.println(position);
+//                System.out.println(dimensions);
+//            }
+//        }
+
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        System.out.println(11);
         return false;
     }
 

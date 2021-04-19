@@ -57,6 +57,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import sun.security.krb5.internal.crypto.CksumType;
+
 public class PlayScreen implements Screen, InputProcessor {
     private ModelBatch mbatch;
     private PerspectiveCamera camera;
@@ -76,11 +78,16 @@ public class PlayScreen implements Screen, InputProcessor {
 
     private Vector2 btnSize = new Vector2();
 
+    private int number;
+
     private boolean Touched = false;
     private boolean NodeDone = false;
     private boolean WindowIsOpen = false;
     // STAGE------------------------------------------------
+    // RANDOM----------------------------------------------
+    public ArrayList Location_Images = new ArrayList();
 
+    // RANDOM----------------------------------------------
 
     // RAYCAST---------------------------------------------------
     public static btDynamicsWorld world;
@@ -110,7 +117,7 @@ public class PlayScreen implements Screen, InputProcessor {
 
         // RANDOM--------------------------------------
         List<Integer> arr = new ArrayList<>();
-        ArrayList Location_Images = new ArrayList();
+//        ArrayList Location_Images = new ArrayList();
         Location_Images.add(-1);
         Location_Images.add("Cubes/one.png");
         Location_Images.add("Cubes/two.png");
@@ -159,18 +166,33 @@ public class PlayScreen implements Screen, InputProcessor {
 
         btnSize = new Vector2(178, 178);
 
-        startBtn.setBounds((MainC.WIDTH/2) - playbtn.getWidth()/ 2 , MainC.HEIGHT/ 7*2, btnSize.x , btnSize.y);
+        number = 1;
 
+        startBtn.setBounds((MainC.WIDTH/2) - playbtn.getWidth()/ 2 , MainC.HEIGHT/ 7*2, btnSize.x , btnSize.y);
+        settingsBtn.setBounds(MainC.WIDTH / 2 - settingsbtn.getWidth() + playbtn.getWidth() / 2, MainC.HEIGHT / 7 * 2 - settingsbtn.getHeight(), 78, 78);
+
+        settingsBtn.addListener(new ClickListener(){
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                Touched = false;
+                WindowIsOpen = false;
+                number = 3;
+                //return super.touchDown(event, x, y, pointer, button);
+                return false;
+            }
+        });
         startBtn.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 Touched = false;
                 WindowIsOpen = false;
+                number = 4;
                 //return super.touchDown(event, x, y, pointer, button);
                 return false;
             }
         });
 
+        stage.addActor(settingsBtn);
         stage.addActor(startBtn);
 
         //STAGE----------------------------------------------
@@ -221,17 +243,16 @@ public class PlayScreen implements Screen, InputProcessor {
         controll.update();
 
 
-
         mbatch.begin(camera);
         mbatch.render(instances, env);
         mbatch.end();
-        if(Touched) {
+        if (Touched) {
             WindowIsOpen = true;
             stage.act();
             stage.draw();
+
         }
     }
-
     @Override
     public void resize(int width, int height) {
 
@@ -284,21 +305,6 @@ public class PlayScreen implements Screen, InputProcessor {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         if (isDragged || WindowIsOpen) return false;
-//        Ray ray = camera.getPickRay(screenX, screenY);
-//        count += 1;
-//        System.out.println(count);
-//        for (int i = 0; i < instances.get(0).getNode("Cube").getChildCount(); i++) {
-//            Node node = instances.get(0).getNode("Cube").getChild(i);
-//            for (BoundingBox box : boundingBoxes) {
-//                if (Intersector.intersectRayBounds(ray, box, intersection) && count > 2) {
-//                    // node.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("Cubes/badlogic.jpg")));
-//                    System.out.println("Intersection " + intersection);
-////                    System.out.println(instances.get(0).getNode("Cube").getChild(i).id);
-//                    return false;
-//                }
-//            }
-//
-//        }
 
         Ray ray = camera.getPickRay(screenX, screenY);
         count += 1;
@@ -324,9 +330,10 @@ public class PlayScreen implements Screen, InputProcessor {
                     closest = nodes.get(i);
                 }
             }
-            closest.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("Cubes/badlogic.jpg")));
             Touched = true;
+            closest.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(number))));
             NodeDone = false;
+
         }
         return false;
 

@@ -246,7 +246,7 @@
       "textures": [
         {
           "id": "Texture.002",
-          "filename": "..\\numbers\\five.png",
+          "filename": "five.png",
           "type": "DIFFUSE"
         }
       ]
@@ -272,7 +272,7 @@
       "textures": [
         {
           "id": "Texture.003",
-          "filename": "..\\numbers\\six.png",
+          "filename": "six.png",
           "type": "DIFFUSE"
         }
       ]

@@ -168,35 +168,41 @@ public class PlayScreen implements Screen, InputProcessor {
 
         number = 1;
 
-        startBtn.setBounds((MainC.WIDTH/2) - playbtn.getWidth()/ 2 , MainC.HEIGHT/ 7*2, btnSize.x , btnSize.y);
+        startBtn.setBounds((MainC.WIDTH / 2) - playbtn.getWidth() / 2, MainC.HEIGHT / 7 * 2, btnSize.x, btnSize.y);
         settingsBtn.setBounds(MainC.WIDTH / 2 - settingsbtn.getWidth() + playbtn.getWidth() / 2, MainC.HEIGHT / 7 * 2 - settingsbtn.getHeight(), 78, 78);
 
-        settingsBtn.addListener(new ClickListener(){
+        final InputMultiplexer multiplexer = new InputMultiplexer();
+
+        settingsBtn.addListener(new ClickListener() {
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                if(!Touched)return;
                 Touched = false;
-                WindowIsOpen = false;
                 number = 3;
-                //return super.touchDown(event, x, y, pointer, button);
-                return false;
+                closest.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(number))));
+                WindowIsOpen = false;
+                Gdx.input.setInputProcessor(multiplexer);
+                super.touchUp(event, x, y, pointer, button);
             }
         });
         startBtn.addListener(new ClickListener() {
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                if(!Touched)return;
                 Touched = false;
-                WindowIsOpen = false;
                 number = 4;
-                //return super.touchDown(event, x, y, pointer, button);
-                return false;
+                closest.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(number))));
+                WindowIsOpen = false;
+                Gdx.input.setInputProcessor(multiplexer);
+                super.touchUp(event, x, y, pointer, button);
             }
+
         });
 
         stage.addActor(settingsBtn);
         stage.addActor(startBtn);
 
         //STAGE----------------------------------------------
-
 
 
         // CAMERA--------------------------------------
@@ -209,10 +215,8 @@ public class PlayScreen implements Screen, InputProcessor {
         controll = new CameraInputController(camera);
         controll.autoUpdate = true;
 
-
-        InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(this);
-        multiplexer.addProcessor(stage);
+//        multiplexer.addProcessor(stage);
         multiplexer.addProcessor(controll);
 
         Gdx.input.setInputProcessor(multiplexer);
@@ -250,9 +254,9 @@ public class PlayScreen implements Screen, InputProcessor {
             WindowIsOpen = true;
             stage.act();
             stage.draw();
-
         }
     }
+
     @Override
     public void resize(int width, int height) {
 
@@ -302,9 +306,11 @@ public class PlayScreen implements Screen, InputProcessor {
         return false;
     }
 
+    private Node closest;
+
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (isDragged || WindowIsOpen) return false;
+        if (isDragged || WindowIsOpen || Touched) return false;
 
         Ray ray = camera.getPickRay(screenX, screenY);
         count += 1;
@@ -312,28 +318,28 @@ public class PlayScreen implements Screen, InputProcessor {
         for (int i = 0; i < instances.get(0).getNode("Cube").getChildCount(); i++) {
             Node node = instances.get(0).getNode("Cube").getChild(i);
             node.calculateBoundingBox(box);
-            if (Intersector.intersectRayBoundsFast(ray, box))  {
+            if (Intersector.intersectRayBoundsFast(ray, box)) {
                 nodes.add(node);
                 NodeDone = true;
             }
         }
-        if(count > 1 && NodeDone){
-            Node closest = nodes.get(0);
+        if (count > 1 && NodeDone) {
+            closest = nodes.get(0);
             Vector3 boxLocation = new Vector3();
             closest.calculateBoundingBox(box).getCenter(boxLocation);
             float minLength = new Vector3(camera.position.x - boxLocation.x, camera.position.y - boxLocation.y, camera.position.z - boxLocation.z).len();
             for (int i = 1; i < nodes.size(); i++) {
                 nodes.get(i).calculateBoundingBox(box).getCenter(boxLocation);
-                float otherLength =  new Vector3(camera.position.x - boxLocation.x, camera.position.y - boxLocation.y, camera.position.z - boxLocation.z).len();
+                float otherLength = new Vector3(camera.position.x - boxLocation.x, camera.position.y - boxLocation.y, camera.position.z - boxLocation.z).len();
                 if (minLength > otherLength) {
                     minLength = otherLength;
                     closest = nodes.get(i);
                 }
             }
             Touched = true;
-            closest.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(number))));
+//            closest.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(number))));
             NodeDone = false;
-
+            Gdx.input.setInputProcessor(stage);
         }
         return false;
 

@@ -76,10 +76,6 @@ public class PlayScreen implements Screen, InputProcessor {
 
     private boolean stage_remembered;
 
-    private Texture playbtn = new Texture("playbtn.png");
-    private Texture settingsbtn = new Texture("settingsbtn.png");
-    private Texture shopbtn = new Texture("shopbtn.png");
-
     private Texture number1 = new Texture("numbers/one.png");
     private Texture number2 = new Texture("numbers/two.png");
     private Texture number3 = new Texture("numbers/three.png");
@@ -93,8 +89,6 @@ public class PlayScreen implements Screen, InputProcessor {
     private int number;
 
     private boolean Touched = false;
-    private boolean NodeDone = false;
-    private boolean WindowIsOpen = false;
     // STAGE------------------------------------------------
     // RANDOM----------------------------------------------
     public ArrayList Location_Images = new ArrayList();
@@ -119,16 +113,10 @@ public class PlayScreen implements Screen, InputProcessor {
     public void show() {
 
         intersection = new Vector3();
-        boundingBoxes.add(new BoundingBox(new Vector3(.5f, .5f, .5f), new Vector3(-.5f, -.5f, -.5f)));
-        boundingBoxes.add(new BoundingBox(new Vector3(.5f, .6f, .5f), new Vector3(.6f, -.6f, -.5f)));
-        boundingBoxes.add(new BoundingBox(new Vector3(-.5f, .6f, .5f), new Vector3(-.6f, -.6f, -.5f)));
-        boundingBoxes.add(new BoundingBox(new Vector3(-.5f, .6f, .5f), new Vector3(.5f, .5f, -.5f)));
-        boundingBoxes.add(new BoundingBox(new Vector3(-.5f, -.5f, .5f), new Vector3(.5f, -.6f, -.5f)));
-        boundingBoxes.add(new BoundingBox(new Vector3(-.5f, -.5f, .5f), new Vector3(.5f, .5f, .6f)));
-        boundingBoxes.add(new BoundingBox(new Vector3(-.5f, -.5f, -.5f), new Vector3(.5f, .5f, -.6f)));
 
         // RANDOM--------------------------------------
         final List<Integer> arr = new ArrayList<>();
+        final List<Integer> arrdeleted = new ArrayList<>();
 //        ArrayList Location_Images = new ArrayList();
         Location_Images.add(-1);
         Location_Images.add("Cubes/one.png");
@@ -144,6 +132,7 @@ public class PlayScreen implements Screen, InputProcessor {
         Integer[] shuffledArray = arr.toArray(new Integer[0]);
         arr.add(-1);
         Collections.reverse(arr);
+        System.out.println(arr);
 
         int count = 0;
 
@@ -157,7 +146,6 @@ public class PlayScreen implements Screen, InputProcessor {
         constrainSolver = new btSequentialImpulseConstraintSolver();
 
         world = new btDiscreteDynamicsWorld(dispatcher, broadphase, constrainSolver, collisioConfig);
-
 
         // Bullet--------------------------------------
 
@@ -202,16 +190,11 @@ public class PlayScreen implements Screen, InputProcessor {
         number_1.setBounds(MainC.WIDTH / 2 - btnSize.x / 2 - btnSize.x - 20, MainC.HEIGHT / 9 * 5, btnSize.x, btnSize.y);
         number_2.setBounds(MainC.WIDTH / 2 - btnSize.x / 2 , MainC.HEIGHT / 9 * 5, btnSize.x, btnSize.y);
         number_3.setBounds(MainC.WIDTH / 2 - btnSize.x / 2  + btnSize.x + 20, MainC.HEIGHT / 9 * 5, btnSize.x, btnSize.y);
-
         number_4.setBounds(MainC.WIDTH / 2 - btnSize.x / 2 - btnSize.x - 20, MainC.HEIGHT / 9 * 5 - btnSize.y - 20, btnSize.x, btnSize.y);
         number_5.setBounds(MainC.WIDTH / 2 - btnSize.x / 2 , MainC.HEIGHT / 9 * 5 - btnSize.y - 20, btnSize.x, btnSize.y);
         number_6.setBounds(MainC.WIDTH / 2 - btnSize.x / 2 + btnSize.x + 20, MainC.HEIGHT / 9 * 5 - btnSize.y - 20, btnSize.x, btnSize.y);
 
         Remembered.setBounds(MainC.WIDTH / 2 - btnSize.x / 2, 30, btnSize.x, btnSize.y);
-
-
-        //startBtn.setBounds((MainC.WIDTH / 2) - playbtn.getWidth() / 2, MainC.HEIGHT / 7 * 2, btnSize.x, btnSize.y);
-        //settingsBtn.setBounds(MainC.WIDTH / 2 - settingsbtn.getWidth() + playbtn.getWidth() / 2, MainC.HEIGHT / 7 * 2 - settingsbtn.getHeight(), 78, 78);
 
         final InputMultiplexer multiplexer = new InputMultiplexer();
 
@@ -277,19 +260,26 @@ public class PlayScreen implements Screen, InputProcessor {
         });
         Remembered.addListener(new ClickListener(){
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 stage_remembered = true;
-                System.out.println("oooo");
                 for (int i = 1; i <= 6; i++) {
-                    instances.get(0).getMaterial("Mat" + arr.get(i)).clear();
-                    //instances.get(0).getMaterial("Mat" + arr.get(i)).set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(i))));
-                    //System.out.println(arr);
+                    arrdeleted.add(i);
                 }
-                //multiplexer.addProcessor(PlayScreen.this);
+                Collections.shuffle(arrdeleted);
+                arrdeleted.remove(0);
+                for (int i :arrdeleted) {
+                    instances.get(0).getMaterial("Mat" + arr.get(i)).clear();
+                }
                 multiplexer.removeProcessor(stage_start);
                 Gdx.input.setInputProcessor(multiplexer);
-                return super.touchDown(event, x, y, pointer, button);
+                super.touchUp(event, x, y, pointer, button);
             }
+
+            /*@Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+
+                return super.touchDown(event, x, y, pointer, button);
+            }*/
 
         });
 
@@ -312,9 +302,9 @@ public class PlayScreen implements Screen, InputProcessor {
         controll = new CameraInputController(camera);
         controll.autoUpdate = true;
         multiplexer.addProcessor(this);
-//        multiplexer.addProcessor(stage);
-        multiplexer.addProcessor(controll);
         multiplexer.addProcessor(stage_start);
+        multiplexer.addProcessor(controll);
+
 
         Gdx.input.setInputProcessor(multiplexer);
         // CAMERA--------------------------------------
@@ -330,17 +320,16 @@ public class PlayScreen implements Screen, InputProcessor {
         camera.update();
         controll.update();
 
-
         mbatch.begin(camera);
         mbatch.render(instances, env);
         mbatch.end();
-        if(!stage_remembered){
-            stage_start.act();
-            stage_start.draw();
-        }
         if (Touched) {
             stage.act();
             stage.draw();
+        }
+        if(!stage_remembered){
+            stage_start.act();
+            stage_start.draw();
         }
     }
 
@@ -397,22 +386,23 @@ public class PlayScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (isDragged || Touched) return false;
+        if (isDragged || Touched || !stage_remembered) return false;
 
         Ray ray = camera.getPickRay(screenX, screenY);
         count += 1;
         System.out.println(count);
         ArrayList<Node> nodes = new ArrayList<>();
+        boolean nodeDone = false;
         for (int i = 0; i < instances.get(0).getNode("Cube").getChildCount(); i++) {
             Node node = instances.get(0).getNode("Cube").getChild(i);
             node.calculateBoundingBox(box);
             if (Intersector.intersectRayBoundsFast(ray, box)) {
                 nodes.add(node);
                 System.out.println("Done");
-                NodeDone = true;
+                nodeDone = true;
             }
         }
-        if (count > 1 && NodeDone) {
+        if (count > 1 && nodeDone) {
             closest = nodes.get(0);
             Vector3 boxLocation = new Vector3();
             closest.calculateBoundingBox(box).getCenter(boxLocation);
@@ -426,25 +416,20 @@ public class PlayScreen implements Screen, InputProcessor {
                 }
             }
             Touched = true;
-//            closest.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(number))));
-            NodeDone = false;
+            //NodeDone = false;
             Gdx.input.setInputProcessor(stage);
         }
         return false;
-
     }
-
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         isDragged = true;
         return false;
     }
-
     @Override
     public boolean mouseMoved(int screenX, int screenY) {
         return false;
     }
-
     @Override
     public boolean scrolled(int amount) {
         return false;

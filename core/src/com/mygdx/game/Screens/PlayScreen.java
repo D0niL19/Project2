@@ -73,6 +73,7 @@ public class PlayScreen implements Screen, InputProcessor {
     // STAGE------------------------------------------------
     private Stage stage;
     private Stage stage_start;
+    private Stage stage_check;
 
     private boolean stage_remembered;
 
@@ -165,15 +166,22 @@ public class PlayScreen implements Screen, InputProcessor {
         instances.add(modelInstance1);
 
         for (int i = 1; i <= 6; i++) {
-            instances.get(0).getMaterial("Mat" + arr.get(i)).clear();
-            instances.get(0).getMaterial("Mat" + arr.get(i)).set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(i))));
+            //instances.get(0).getMaterial("Mat" + arr.get(i)).clear();
+            instances.get(0).getNode("Cube").getChild(arr.get(i) - 1).parts.get(0).material.clear();
+            instances.get(0).getNode("Cube").getChild(arr.get(i) - 1).parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(i))));
+
+
+
+            //instances.get(0).getMaterial("Mat" + arr.get(i)).set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(i))));
+            System.out.println(instances.get(0).getNode("Cube").getChild(i - 1).parts.get(0).material.copy());
+            ;
         }
-        instances.get(0).getNode("Cube").getChild(5);
         // D3DJ ------------------------------------------------------
 
         //STAGE----------------------------------------------
         stage = new Stage();
         stage_start = new Stage();
+        stage_check = new Stage();
         stage_remembered = false;
         Button number_1 = new Button(new SpriteDrawable(new Sprite(number1)));
         Button number_2 = new Button(new SpriteDrawable(new Sprite(number2)));
@@ -181,6 +189,9 @@ public class PlayScreen implements Screen, InputProcessor {
         Button number_4 = new Button(new SpriteDrawable(new Sprite(number4)));
         Button number_5 = new Button(new SpriteDrawable(new Sprite(number5)));
         Button number_6 = new Button(new SpriteDrawable(new Sprite(number6)));
+
+
+        Button check = new Button(new SpriteDrawable(new Sprite(remembered)));
 
         Button Remembered = new Button(new SpriteDrawable(new Sprite(remembered)));
 
@@ -195,6 +206,7 @@ public class PlayScreen implements Screen, InputProcessor {
         number_6.setBounds(MainC.WIDTH / 2 - btnSize.x / 2 + btnSize.x + 20, MainC.HEIGHT / 9 * 5 - btnSize.y - 20, btnSize.x, btnSize.y);
 
         Remembered.setBounds(MainC.WIDTH / 2 - btnSize.x / 2, 30, btnSize.x, btnSize.y);
+        check.setBounds(MainC.WIDTH / 2 - btnSize.x / 2, MainC.HEIGHT / 9 * 7, btnSize.x, btnSize.y);
 
         final InputMultiplexer multiplexer = new InputMultiplexer();
 
@@ -271,16 +283,31 @@ public class PlayScreen implements Screen, InputProcessor {
                     instances.get(0).getMaterial("Mat" + arr.get(i)).clear();
                 }
                 multiplexer.removeProcessor(stage_start);
+                multiplexer.removeProcessor(controll);
+                multiplexer.addProcessor(stage_check);
+                multiplexer.addProcessor(controll);
+
                 Gdx.input.setInputProcessor(multiplexer);
                 super.touchUp(event, x, y, pointer, button);
             }
+        });
+        check.addListener(new ClickListener(){
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                System.out.println(arr);
+                for (int i = 1; i <= 6; i++) {
 
-            /*@Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    //System.out.println(instances.get(0).getMaterial("Mat" + arr.get(i)));
+                    System.out.println(instances.get(0).getNode("Cube").getChild(arr.get(i) - 1).parts.get(0).material.equals(instances.get(0).getNode("Cube").getChild(i - 1).parts.get(0).material.copy()));
+                    System.out.println(instances.get(0).getNode("Cube").getChild(arr.get(i) - 1).parts.get(0).material.hashCode());
+                    System.out.println(instances.get(0).getNode("Cube").getChild(i - 1).parts.get(0).material.hashCode());
 
-                return super.touchDown(event, x, y, pointer, button);
-            }*/
+                   /*if(instances.get(0).getMaterial("Mat" + arr.get(i)) == instances.get(0).getNode("Cube").getChild(i).parts.get(0).material.copy()){
 
+                    }*/
+                }
+                super.touchUp(event, x, y, pointer, button);
+            }
         });
 
         stage.addActor(number_1);
@@ -290,6 +317,7 @@ public class PlayScreen implements Screen, InputProcessor {
         stage.addActor(number_5);
         stage.addActor(number_6);
         stage_start.addActor(Remembered);
+        stage_check.addActor(check);
         //STAGE----------------------------------------------
 
         // CAMERA--------------------------------------
@@ -330,6 +358,9 @@ public class PlayScreen implements Screen, InputProcessor {
         if(!stage_remembered){
             stage_start.act();
             stage_start.draw();
+        }else{
+            stage_check.act();
+            stage_check.draw();
         }
     }
 

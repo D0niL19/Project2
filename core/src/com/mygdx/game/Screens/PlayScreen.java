@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Model;
 import com.badlogic.gdx.graphics.g3d.ModelBatch;
@@ -93,6 +94,8 @@ public class PlayScreen implements Screen, InputProcessor {
     // STAGE------------------------------------------------
     // RANDOM----------------------------------------------
     public ArrayList Location_Images = new ArrayList();
+    public ArrayList Textures = new ArrayList();
+    public ArrayList aaaa = new ArrayList();
 
     // RANDOM----------------------------------------------
 
@@ -126,6 +129,10 @@ public class PlayScreen implements Screen, InputProcessor {
         Location_Images.add("Cubes/four.png");
         Location_Images.add("Cubes/five.png");
         Location_Images.add("Cubes/six.png");
+        Textures.add(-1);
+        for (int i = 1; i <= 6; i++) {
+            Textures.add(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(i))));
+        }
         for (int i = 1; i <= 6; i++) {
             arr.add(i);
         }
@@ -164,13 +171,14 @@ public class PlayScreen implements Screen, InputProcessor {
         Model model1 = modelLoader.loadModel(Gdx.files.getFileHandle("Cubes/Ready.g3dj", Files.FileType.Internal));
         ModelInstance modelInstance1 = new ModelInstance(model1);
         instances.add(modelInstance1);
-
+        aaaa.add(-1);
         for (int i = 1; i <= 6; i++) {
             //instances.get(0).getMaterial("Mat" + arr.get(i)).clear();
             instances.get(0).getNode("Cube").getChild(arr.get(i) - 1).parts.get(0).material.clear();
-            instances.get(0).getNode("Cube").getChild(arr.get(i) - 1).parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(i))));
+            instances.get(0).getNode("Cube").getChild(arr.get(i) - 1).parts.get(0).material.set((Attribute) Textures.get(i));
 
-
+            aaaa.add(instances.get(0).getNode("Cube").getChild(arr.get(i) - 1).parts.get(0).material.copy().hashCode());
+            //System.out.println(aaaa.get(i).hashCode());
 
             //instances.get(0).getMaterial("Mat" + arr.get(i)).set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(i))));
             System.out.println(instances.get(0).getNode("Cube").getChild(i - 1).parts.get(0).material.copy());
@@ -215,7 +223,7 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 1;
-                closest.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(number))));
+                closest.parts.get(0).material.set((Attribute) Textures.get(number));
                 Gdx.input.setInputProcessor(multiplexer);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -225,7 +233,7 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 2;
-                closest.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(number))));
+                closest.parts.get(0).material.set((Attribute) Textures.get(number));
                 Gdx.input.setInputProcessor(multiplexer);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -235,7 +243,7 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 3;
-                closest.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(number))));
+                closest.parts.get(0).material.set((Attribute) Textures.get(number));
                 Gdx.input.setInputProcessor(multiplexer);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -245,7 +253,7 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 4;
-                closest.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(number))));
+                closest.parts.get(0).material.set((Attribute) Textures.get(number));
                 Gdx.input.setInputProcessor(multiplexer);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -255,7 +263,7 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 5;
-                closest.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(number))));
+                closest.parts.get(0).material.set((Attribute) Textures.get(number));
                 Gdx.input.setInputProcessor(multiplexer);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -265,7 +273,7 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 6;
-                closest.parts.get(0).material.set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(number))));
+                closest.parts.get(0).material.set((Attribute)Textures.get(number));
                 Gdx.input.setInputProcessor(multiplexer);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -280,7 +288,7 @@ public class PlayScreen implements Screen, InputProcessor {
                 Collections.shuffle(arrdeleted);
                 arrdeleted.remove(0);
                 for (int i :arrdeleted) {
-                    instances.get(0).getMaterial("Mat" + arr.get(i)).clear();
+                    instances.get(0).getNode("Cube").getChild(i - 1).parts.get(0).material.clear();
                 }
                 multiplexer.removeProcessor(stage_start);
                 multiplexer.removeProcessor(controll);
@@ -294,18 +302,20 @@ public class PlayScreen implements Screen, InputProcessor {
         check.addListener(new ClickListener(){
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                System.out.println(arr);
+                //System.out.println(arr);
                 for (int i = 1; i <= 6; i++) {
 
                     //System.out.println(instances.get(0).getMaterial("Mat" + arr.get(i)));
-                    System.out.println(instances.get(0).getNode("Cube").getChild(arr.get(i) - 1).parts.get(0).material.equals(instances.get(0).getNode("Cube").getChild(i - 1).parts.get(0).material.copy()));
-                    System.out.println(instances.get(0).getNode("Cube").getChild(arr.get(i) - 1).parts.get(0).material.hashCode());
-                    System.out.println(instances.get(0).getNode("Cube").getChild(i - 1).parts.get(0).material.hashCode());
-
+                    //System.out.println(instances.get(0).getNode("Cube").getChild(arr.get(i) - 1).parts.get(0).material.equals(instances.get(0).getNode("Cube").getChild(i - 1).parts.get(0).material.copy()));
+                   // System.out.println(instances.get(0).getNode("Cube").getChild(arr.get(i) - 1).parts.get(0).material.copy());
+                    System.out.println(aaaa.get(i) / 100);
+                    System.out.println(instances.get(0).getNode("Cube").getChild(i - 1).parts.get(0).material.hashCode() / 100);
+                    System.out.println("---------------");
                    /*if(instances.get(0).getMaterial("Mat" + arr.get(i)) == instances.get(0).getNode("Cube").getChild(i).parts.get(0).material.copy()){
 
                     }*/
                 }
+                System.out.println();
                 super.touchUp(event, x, y, pointer, button);
             }
         });
@@ -421,7 +431,7 @@ public class PlayScreen implements Screen, InputProcessor {
 
         Ray ray = camera.getPickRay(screenX, screenY);
         count += 1;
-        System.out.println(count);
+        //System.out.println(count);
         ArrayList<Node> nodes = new ArrayList<>();
         boolean nodeDone = false;
         for (int i = 0; i < instances.get(0).getNode("Cube").getChildCount(); i++) {
@@ -429,7 +439,7 @@ public class PlayScreen implements Screen, InputProcessor {
             node.calculateBoundingBox(box);
             if (Intersector.intersectRayBoundsFast(ray, box)) {
                 nodes.add(node);
-                System.out.println("Done");
+                //System.out.println("Done");
                 nodeDone = true;
             }
         }

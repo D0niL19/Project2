@@ -123,28 +123,33 @@ public class PlayScreen implements Screen, InputProcessor {
         // RANDOM--------------------------------------
         final List<Integer> arr = new ArrayList<>();
         final List<Integer> arrdeleted = new ArrayList<>();
-//        ArrayList Location_Images = new ArrayList();
-        Location_Images.add(-1);
+        final List<String> Location_Images = new ArrayList<>();
+        Location_Images.add(null);
         Location_Images.add("Cubes/one.png");
         Location_Images.add("Cubes/two.png");
         Location_Images.add("Cubes/three.png");
         Location_Images.add("Cubes/four.png");
         Location_Images.add("Cubes/five.png");
         Location_Images.add("Cubes/six.png");
-        Textures.add(null);
-        for (int i = 1; i <= 6; i++) {
-            Textures.add(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(i))));
-        }
+        //Collections.shuffle(Location_Images);
+
         for (int i = 1; i <= 6; i++) {
             arr.add(i);
         }
         Collections.shuffle(arr);
-        Integer[] shuffledArray = arr.toArray(new Integer[0]);
         arr.add(-1);
         Collections.reverse(arr);
-        System.out.println(arr);
 
-        int count = 0;
+        Textures.add(null);
+        base_arr.add(-1);
+        still_arr.add(-1);
+        for (int i = 1; i <= 6; i++) {
+            Textures.add(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(arr.get(i)))));
+            base_arr.add(arr.get(i));
+            still_arr.add(-1);
+        }
+        System.out.println(base_arr);
+        System.out.println(still_arr);
 
         // RANDOM--------------------------------------
 
@@ -173,20 +178,15 @@ public class PlayScreen implements Screen, InputProcessor {
         Model model1 = modelLoader.loadModel(Gdx.files.getFileHandle("Cubes/Ready.g3dj", Files.FileType.Internal));
         ModelInstance modelInstance1 = new ModelInstance(model1);
         instances.add(modelInstance1);
-
-        base_arr.add(-1);
-        still_arr.add(-1);
         for (int i = 1; i <= 6; i++) {
             //instances.get(0).getMaterial("Mat" + arr.get(i)).clear();
-            instances.get(0).getNode("Cube").getChild(arr.get(i) - 1).parts.get(0).material.clear();
-            instances.get(0).getNode("Cube").getChild(arr.get(i) - 1).parts.get(0).material.set(Textures.get(i));
+            instances.get(0).getNode("Cube").getChild(i - 1).parts.get(0).material.clear();
+            instances.get(0).getNode("Cube").getChild(i - 1).parts.get(0).material.set(Textures.get(i));
 
-            base_arr.add(arr.get(i));
-            still_arr.add(-1);
             //System.out.println(aaaa.get(i).hashCode());
 
             //instances.get(0).getMaterial("Mat" + arr.get(i)).set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(i))));
-            System.out.println(instances.get(0).getNode("Cube").getChild(i - 1).parts.get(0).material.copy());
+            //System.out.println(instances.get(0).getNode("Cube").getChild(i - 1).parts.get(0).material.copy());
             ;
         }
         // D3DJ ------------------------------------------------------
@@ -229,8 +229,8 @@ public class PlayScreen implements Screen, InputProcessor {
                 Touched = false;
                 number = 1;
                 //System.out.println(closest.id.charAt(8));
-                still_arr.set(number ,Integer.parseInt(String.valueOf(closest.id.charAt(8))));
-                still_arr.set(base_arr.indexOf(arrdeleted.get(0)), arrdeleted.get(0));
+                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);
+                //still_arr.set(base_arr.indexOf(arrdeleted.get(0)), arrdeleted.get(0));
                 System.out.println(still_arr);
                 //System.out.println(base_arr);
                 closest.parts.get(0).material.set((Attribute) Textures.get(number));
@@ -243,8 +243,7 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 2;
-                still_arr.set(number ,Integer.parseInt(String.valueOf(closest.id.charAt(8))));
-                System.out.println(still_arr);
+                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);                System.out.println(still_arr);
                 //System.out.println(base_arr);
                 closest.parts.get(0).material.set(Textures.get(number));
                 Gdx.input.setInputProcessor(multiplexer);
@@ -256,8 +255,7 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 3;
-                still_arr.set(number ,Integer.parseInt(String.valueOf(closest.id.charAt(8))));
-                System.out.println(still_arr);
+                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);                System.out.println(still_arr);
                 //System.out.println(base_arr);
                 closest.parts.get(0).material.set(Textures.get(number));
                 Gdx.input.setInputProcessor(multiplexer);
@@ -269,8 +267,7 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 4;
-                still_arr.set(number ,Integer.parseInt(String.valueOf(closest.id.charAt(8))));
-                System.out.println(still_arr);
+                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);                System.out.println(still_arr);
                 //System.out.println(base_arr);
                 closest.parts.get(0).material.set( Textures.get(number));
                 Gdx.input.setInputProcessor(multiplexer);
@@ -282,8 +279,7 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 5;
-                still_arr.set(number ,Integer.parseInt(String.valueOf(closest.id.charAt(8))));
-                System.out.println(still_arr);
+                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);                System.out.println(still_arr);
                 //System.out.println(base_arr);
                 closest.parts.get(0).material.set(Textures.get(number));
                 Gdx.input.setInputProcessor(multiplexer);
@@ -295,8 +291,7 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 6;
-                still_arr.set(number ,Integer.parseInt(String.valueOf(closest.id.charAt(8))));
-                System.out.println(still_arr);
+                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);                System.out.println(still_arr);
                //System.out.println(base_arr);
                 closest.parts.get(0).material.set(Textures.get(number));
                 Gdx.input.setInputProcessor(multiplexer);
@@ -311,7 +306,7 @@ public class PlayScreen implements Screen, InputProcessor {
                     arrdeleted.add(i);
                 }
                 Collections.shuffle(arrdeleted);
-                still_arr.set(base_arr.indexOf(arrdeleted.get(0)), arrdeleted.get(0));
+                still_arr.set(arrdeleted.get(0),
 
                 System.out.println(arrdeleted);
                 arrdeleted.remove(0);
@@ -319,8 +314,8 @@ public class PlayScreen implements Screen, InputProcessor {
                     instances.get(0).getNode("Cube").getChild(i - 1).parts.get(0).material.clear();
                     //still_arr.set(i, -1);
                 }
-                System.out.println(still_arr);
-                System.out.println(base_arr);
+                //System.out.println(still_arr);
+                //System.out.println(base_arr);
                 multiplexer.removeProcessor(stage_start);
                 multiplexer.removeProcessor(controll);
                 multiplexer.addProcessor(stage_check);

@@ -71,6 +71,7 @@ public class PlayScreen implements Screen, InputProcessor {
     private CameraInputController controll;
     private Environment env;
     private int count;
+    private boolean win = false;
 
     // STAGE------------------------------------------------
     private Stage stage;
@@ -148,6 +149,7 @@ public class PlayScreen implements Screen, InputProcessor {
             base_arr.add(arr.get(i));
             still_arr.add(-1);
         }
+        System.out.println(arr + "-----");
         System.out.println(base_arr);
         System.out.println(still_arr);
 
@@ -232,8 +234,8 @@ public class PlayScreen implements Screen, InputProcessor {
                 still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);
                 //still_arr.set(base_arr.indexOf(arrdeleted.get(0)), arrdeleted.get(0));
                 System.out.println(still_arr);
-                //System.out.println(base_arr);
-                closest.parts.get(0).material.set((Attribute) Textures.get(number));
+                System.out.println(base_arr);
+                closest.parts.get(0).material.set((Attribute) Textures.get(arr.indexOf(number)));
                 Gdx.input.setInputProcessor(multiplexer);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -243,9 +245,11 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 2;
-                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);                System.out.println(still_arr);
-                //System.out.println(base_arr);
-                closest.parts.get(0).material.set(Textures.get(number));
+                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);
+                //still_arr.set(base_arr.indexOf(arrdeleted.get(0)), arrdeleted.get(0));
+                System.out.println(still_arr);
+                System.out.println(base_arr);
+                closest.parts.get(0).material.set((Attribute) Textures.get(arr.indexOf(number)));
                 Gdx.input.setInputProcessor(multiplexer);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -255,9 +259,11 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 3;
-                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);                System.out.println(still_arr);
-                //System.out.println(base_arr);
-                closest.parts.get(0).material.set(Textures.get(number));
+                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);
+                //still_arr.set(base_arr.indexOf(arrdeleted.get(0)), arrdeleted.get(0));
+                System.out.println(still_arr);
+                System.out.println(base_arr);
+                closest.parts.get(0).material.set((Attribute) Textures.get(arr.indexOf(number)));
                 Gdx.input.setInputProcessor(multiplexer);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -267,9 +273,11 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 4;
-                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);                System.out.println(still_arr);
-                //System.out.println(base_arr);
-                closest.parts.get(0).material.set( Textures.get(number));
+                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);
+                //still_arr.set(base_arr.indexOf(arrdeleted.get(0)), arrdeleted.get(0));
+                System.out.println(still_arr);
+                System.out.println(base_arr);
+                closest.parts.get(0).material.set((Attribute) Textures.get(arr.indexOf(number)));
                 Gdx.input.setInputProcessor(multiplexer);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -279,9 +287,11 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 5;
-                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);                System.out.println(still_arr);
-                //System.out.println(base_arr);
-                closest.parts.get(0).material.set(Textures.get(number));
+                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);
+                //still_arr.set(base_arr.indexOf(arrdeleted.get(0)), arrdeleted.get(0));
+                System.out.println(still_arr);
+                System.out.println(base_arr);
+                closest.parts.get(0).material.set((Attribute) Textures.get(arr.indexOf(number)));
                 Gdx.input.setInputProcessor(multiplexer);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -291,9 +301,11 @@ public class PlayScreen implements Screen, InputProcessor {
                 if(!Touched)return;
                 Touched = false;
                 number = 6;
-                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);                System.out.println(still_arr);
-               //System.out.println(base_arr);
-                closest.parts.get(0).material.set(Textures.get(number));
+                still_arr.set(Integer.parseInt(String.valueOf(closest.id.charAt(8))) ,number);
+                //still_arr.set(base_arr.indexOf(arrdeleted.get(0)), arrdeleted.get(0));
+                System.out.println(still_arr);
+                System.out.println(base_arr);
+                closest.parts.get(0).material.set((Attribute) Textures.get(arr.indexOf(number)));
                 Gdx.input.setInputProcessor(multiplexer);
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -306,7 +318,7 @@ public class PlayScreen implements Screen, InputProcessor {
                     arrdeleted.add(i);
                 }
                 Collections.shuffle(arrdeleted);
-                still_arr.set(arrdeleted.get(0),
+                still_arr.set(arrdeleted.get(0),base_arr.get(arrdeleted.get(0)));
 
                 System.out.println(arrdeleted);
                 arrdeleted.remove(0);
@@ -329,12 +341,20 @@ public class PlayScreen implements Screen, InputProcessor {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 //System.out.println(arr);
+                win = true;
                 for (int i = 1; i <= 6; i++) {
                     if(base_arr.get(i) != still_arr.get(i)){
-                        System.out.println("NOOOO!!!");
+                        win = false;
+                        break;
                     }
                 }
-                System.out.println("YES");
+                if(win){
+                    System.out.println("YES");
+                }
+                else{
+                    System.out.println("NOOOO!!!");
+                }
+
                 super.touchUp(event, x, y, pointer, button);
             }
         });

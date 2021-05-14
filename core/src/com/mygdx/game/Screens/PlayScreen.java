@@ -42,6 +42,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btConstraintSolver;
 import com.badlogic.gdx.physics.bullet.dynamics.btDiscreteDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btSequentialImpulseConstraintSolver;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -71,24 +72,28 @@ public class PlayScreen implements Screen, InputProcessor {
     private CameraInputController controll;
     private Environment env;
     private int count;
-    private boolean win = false;
+    private int win = 0;
+    private boolean winb = false;
 
     // STAGE------------------------------------------------
     private Stage stage;
     private Stage stage_start;
     private Stage stage_check;
-
+    private Stage stage_win;
+    private Stage stage_lose;
     private boolean stage_remembered;
 
-    private Texture number1 = new Texture("numbers/one.png");
-    private Texture number2 = new Texture("numbers/two.png");
-    private Texture number3 = new Texture("numbers/three.png");
-    private Texture number4 = new Texture("numbers/four.png");
-    private Texture number5 = new Texture("numbers/five.png");
-    private Texture number6 = new Texture("numbers/six.png");
-    private Texture remembered = new Texture("badlogic.jpg");
+    private final Texture WinT = new Texture("YOU WIN.png");
+    private final Texture LoseT = new Texture("YOU LOSE.png");
 
-    private Vector2 btnSize = new Vector2();
+
+    private final Texture number1 = new Texture("numbers/one.png");
+    private final Texture number2 = new Texture("numbers/two.png");
+    private final Texture number3 = new Texture("numbers/three.png");
+    private final Texture number4 = new Texture("numbers/four.png");
+    private final Texture number5 = new Texture("numbers/five.png");
+    private final Texture number6 = new Texture("numbers/six.png");
+    private final Texture remembered = new Texture("Remembered.png");
 
     private int number;
 
@@ -189,7 +194,7 @@ public class PlayScreen implements Screen, InputProcessor {
 
             //instances.get(0).getMaterial("Mat" + arr.get(i)).set(new TextureAttribute(TextureAttribute.Diffuse, new Texture("" + Location_Images.get(i))));
             //System.out.println(instances.get(0).getNode("Cube").getChild(i - 1).parts.get(0).material.copy());
-            ;
+
         }
         // D3DJ ------------------------------------------------------
 
@@ -197,7 +202,16 @@ public class PlayScreen implements Screen, InputProcessor {
         stage = new Stage();
         stage_start = new Stage();
         stage_check = new Stage();
+        stage_win = new Stage();
+        stage_lose = new Stage();
         stage_remembered = false;
+
+        TextureRegion WinRegion = new TextureRegion(WinT, 10, 10, WinT.getWidth(), WinT.getHeight());
+        com.badlogic.gdx.scenes.scene2d.ui.Image WinActor  = new com.badlogic.gdx.scenes.scene2d.ui.Image(WinRegion);
+        TextureRegion LoseRegion = new TextureRegion(LoseT, 10, 10, LoseT.getWidth(), LoseT.getHeight());
+        com.badlogic.gdx.scenes.scene2d.ui.Image LoseActor  = new com.badlogic.gdx.scenes.scene2d.ui.Image(LoseRegion);
+
+
         Button number_1 = new Button(new SpriteDrawable(new Sprite(number1)));
         Button number_2 = new Button(new SpriteDrawable(new Sprite(number2)));
         Button number_3 = new Button(new SpriteDrawable(new Sprite(number3)));
@@ -206,11 +220,11 @@ public class PlayScreen implements Screen, InputProcessor {
         Button number_6 = new Button(new SpriteDrawable(new Sprite(number6)));
 
 
-        Button check = new Button(new SpriteDrawable(new Sprite(remembered)));
-
+        Button check = new Button(new SpriteDrawable(new Sprite(new Texture("badlogic.jpg"))));
         Button Remembered = new Button(new SpriteDrawable(new Sprite(remembered)));
 
-        btnSize = new Vector2(140, 140);
+
+        Vector2 btnSize = new Vector2(140, 140);
         number = 1;
 
         number_1.setBounds(MainC.WIDTH / 2 - btnSize.x / 2 - btnSize.x - 20, MainC.HEIGHT / 9 * 5, btnSize.x, btnSize.y);
@@ -341,17 +355,23 @@ public class PlayScreen implements Screen, InputProcessor {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 //System.out.println(arr);
-                win = true;
+                win = 0;
+                winb = true;
                 for (int i = 1; i <= 6; i++) {
                     if(base_arr.get(i) != still_arr.get(i)){
-                        win = false;
+                        win = -1;
+                        winb = false;
                         break;
                     }
                 }
-                if(win){
+                if(winb){
+                    win = 1;
+                }
+
+                if(win == 1){
                     System.out.println("YES");
                 }
-                else{
+                else if(win == -1){
                     System.out.println("NOOOO!!!");
                 }
 
@@ -365,6 +385,10 @@ public class PlayScreen implements Screen, InputProcessor {
         stage.addActor(number_4);
         stage.addActor(number_5);
         stage.addActor(number_6);
+
+        //stage_win.addActor(WinActor);
+        //stage_lose.addActor(LoseActor);
+
         stage_start.addActor(Remembered);
         stage_check.addActor(check);
         //STAGE----------------------------------------------
@@ -410,6 +434,24 @@ public class PlayScreen implements Screen, InputProcessor {
         }else{
             stage_check.act();
             stage_check.draw();
+        }
+
+        if(win == 1){
+            stage_check.clear();
+            stage_win.getBatch().begin();
+            stage_win.getBatch().draw(WinT, MainC.WIDTH / 2 - WinT.getWidth() / 2, MainC.HEIGHT / 5 * 4);
+            stage_win.getBatch().end();
+
+            stage_win.act();
+            stage_win.draw();
+        }else if(win == -1){
+            stage_check.clear();
+            stage_lose.getBatch().begin();
+            stage_lose.getBatch().draw(LoseT, MainC.WIDTH / 2 - LoseT.getWidth() / 2, MainC.HEIGHT / 5 * 4);
+            stage_lose.getBatch().end();
+
+            stage_lose.act();
+            stage_lose.draw();
         }
     }
 

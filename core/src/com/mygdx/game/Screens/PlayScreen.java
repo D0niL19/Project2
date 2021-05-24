@@ -75,8 +75,6 @@ public class PlayScreen implements Screen, InputProcessor {
     private int win = 0;
     private boolean winb = false;
 
-    private MainC mc;
-
     // STAGE------------------------------------------------
     private Stage stage;
     private Stage stage_start;
@@ -96,7 +94,8 @@ public class PlayScreen implements Screen, InputProcessor {
     private final Texture number5 = new Texture("numbers/five.png");
     private final Texture number6 = new Texture("numbers/six.png");
     private final Texture remembered = new Texture("Remembered.png");
-    private final Texture again = new Texture("tick.png");
+    private final Texture again = new Texture("refresh.png");
+    private final Texture home = new Texture("home.png");
 
     private int number;
 
@@ -128,6 +127,7 @@ public class PlayScreen implements Screen, InputProcessor {
     public void show() {
 
         intersection = new Vector3();
+        win = 0;
 
         // RANDOM--------------------------------------
         final List<Integer> arr = new ArrayList<>();
@@ -226,7 +226,8 @@ public class PlayScreen implements Screen, InputProcessor {
         Button check = new Button(new SpriteDrawable(new Sprite(new Texture("tick.png"))));
         Button Remembered = new Button(new SpriteDrawable(new Sprite(remembered)));
 
-        Button Again = new Button(new SpriteDrawable(new Sprite(again)));
+        final Button Again = new Button(new SpriteDrawable(new Sprite(again)));
+        final Button Home = new Button(new SpriteDrawable(new Sprite(home)));
 
         Vector2 btnSize = new Vector2(140, 140);
         number = 1;
@@ -238,7 +239,8 @@ public class PlayScreen implements Screen, InputProcessor {
         number_5.setBounds(MainC.WIDTH / 2 - btnSize.x / 2 , MainC.HEIGHT / 9 * 5 - btnSize.y - 20, btnSize.x, btnSize.y);
         number_6.setBounds(MainC.WIDTH / 2 - btnSize.x / 2 + btnSize.x + 20, MainC.HEIGHT / 9 * 5 - btnSize.y - 20, btnSize.x, btnSize.y);
 
-        Again.setBounds(MainC.WIDTH / 2 - btnSize.x / 2, MainC.HEIGHT / 9 * 2, btnSize.x, btnSize.y);
+        Home.setBounds(MainC.WIDTH / 3 *2 - btnSize.x / 2, MainC.HEIGHT / 9 * 2, btnSize.x, btnSize.y);
+        Again.setBounds(MainC.WIDTH / 3 - btnSize.x / 2, MainC.HEIGHT / 9 * 2, btnSize.x, btnSize.y);
 
         Remembered.setBounds(MainC.WIDTH / 2 - remembered.getWidth() / 2, 30, remembered.getWidth(), remembered.getHeight());
         check.setBounds(MainC.WIDTH / 2 - btnSize.x / 2, MainC.HEIGHT / 9 * 7, btnSize.x, btnSize.y);
@@ -380,6 +382,8 @@ public class PlayScreen implements Screen, InputProcessor {
                 else if(win == -1){
                     System.out.println("NOOOO!!!");
                 }
+                stage_lose.addActor(Again);
+                stage_lose.addActor(Home);
 
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -387,7 +391,16 @@ public class PlayScreen implements Screen, InputProcessor {
         Again.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                //mc.setScreen(mc.playScreen);
+                MainC.mainC.playAgain();
+                MainC.mainC.setScreen(MainC.mainC.playScreen);
+                return super.touchDown(event, x, y, pointer, button);
+            }
+        });
+        Home.addListener(new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                MainC.mainC.GoHome();
+                MainC.mainC.setScreen(MainC.mainC.mainMenu);
                 return super.touchDown(event, x, y, pointer, button);
             }
         });
@@ -404,7 +417,7 @@ public class PlayScreen implements Screen, InputProcessor {
 
 
         //stage_win.addActor(WinActor);
-        //stage_lose.addActor(Again);
+
 
         stage_start.addActor(Remembered);
         stage_check.addActor(check);

@@ -37,11 +37,6 @@ public class MainMenu implements Screen {
 
     public static boolean InGame = false;
 
-    private MainC mc;
-    public MainMenu(MainC mainC){
-        mc = mainC;
-    }
-
     /*public boolean Ingame(boolean g){
         g = this.InGame;
         return g;
@@ -73,7 +68,7 @@ public class MainMenu implements Screen {
         startBtn.addListener(new ClickListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                mc.setScreen(mc.playScreen);
+                MainC.mainC.setScreen(MainC.mainC.playScreen);
                 InGame = true;
                 return super.touchDown(event, x, y, pointer, button);
             }

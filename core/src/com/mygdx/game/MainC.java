@@ -17,20 +17,35 @@ public class MainC extends Game {
 	public static final String TITLE = "Spatial memory";
 
 
-	private MainMenu mainMenu;
+	public MainMenu mainMenu;
 	public PlayScreen playScreen;
 	private Viewport viewport;
 	private Camera camera;
 
+	public static MainC mainC;
+
+	static {
+		mainC = new MainC();
+	}
+
+	private MainC() {
+
+	}
 
 	@Override
-	public void create () {
+	public void create() {
 		//camera = new PerspectiveCamera();
-
 		playScreen = new PlayScreen();
-		mainMenu = new MainMenu(MainC.this);
+		mainMenu = new MainMenu();
 		setScreen(mainMenu);
 	}
 
+	public void playAgain(){
+		playScreen = new PlayScreen();
+	}
 
+	public void GoHome(){
+		mainMenu = new MainMenu();
+		playScreen = new PlayScreen();
+	}
 }

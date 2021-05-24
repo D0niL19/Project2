@@ -11,6 +11,6 @@ public class DesktopLauncher {
 		config.height = MainC.HEIGHT;
 		config.title = MainC.TITLE;
 
-		new LwjglApplication(new MainC(), config);
+		new LwjglApplication(MainC.mainC, config);
 	}
 }

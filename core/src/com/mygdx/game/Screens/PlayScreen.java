@@ -75,6 +75,8 @@ public class PlayScreen implements Screen, InputProcessor {
     private int win = 0;
     private boolean winb = false;
 
+    private MainC mc;
+
     // STAGE------------------------------------------------
     private Stage stage;
     private Stage stage_start;
@@ -94,6 +96,7 @@ public class PlayScreen implements Screen, InputProcessor {
     private final Texture number5 = new Texture("numbers/five.png");
     private final Texture number6 = new Texture("numbers/six.png");
     private final Texture remembered = new Texture("Remembered.png");
+    private final Texture again = new Texture("tick.png");
 
     private int number;
 
@@ -220,9 +223,10 @@ public class PlayScreen implements Screen, InputProcessor {
         Button number_6 = new Button(new SpriteDrawable(new Sprite(number6)));
 
 
-        Button check = new Button(new SpriteDrawable(new Sprite(new Texture("badlogic.jpg"))));
+        Button check = new Button(new SpriteDrawable(new Sprite(new Texture("tick.png"))));
         Button Remembered = new Button(new SpriteDrawable(new Sprite(remembered)));
 
+        Button Again = new Button(new SpriteDrawable(new Sprite(again)));
 
         Vector2 btnSize = new Vector2(140, 140);
         number = 1;
@@ -234,7 +238,9 @@ public class PlayScreen implements Screen, InputProcessor {
         number_5.setBounds(MainC.WIDTH / 2 - btnSize.x / 2 , MainC.HEIGHT / 9 * 5 - btnSize.y - 20, btnSize.x, btnSize.y);
         number_6.setBounds(MainC.WIDTH / 2 - btnSize.x / 2 + btnSize.x + 20, MainC.HEIGHT / 9 * 5 - btnSize.y - 20, btnSize.x, btnSize.y);
 
-        Remembered.setBounds(MainC.WIDTH / 2 - btnSize.x / 2, 30, btnSize.x, btnSize.y);
+        Again.setBounds(MainC.WIDTH / 2 - btnSize.x / 2, MainC.HEIGHT / 9 * 2, btnSize.x, btnSize.y);
+
+        Remembered.setBounds(MainC.WIDTH / 2 - remembered.getWidth() / 2, 30, remembered.getWidth(), remembered.getHeight());
         check.setBounds(MainC.WIDTH / 2 - btnSize.x / 2, MainC.HEIGHT / 9 * 7, btnSize.x, btnSize.y);
 
         final InputMultiplexer multiplexer = new InputMultiplexer();
@@ -378,6 +384,15 @@ public class PlayScreen implements Screen, InputProcessor {
                 super.touchUp(event, x, y, pointer, button);
             }
         });
+        Again.addListener(new ClickListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                //mc.setScreen(mc.playScreen);
+                return super.touchDown(event, x, y, pointer, button);
+            }
+        });
+
+
 
         stage.addActor(number_1);
         stage.addActor(number_2);
@@ -386,8 +401,10 @@ public class PlayScreen implements Screen, InputProcessor {
         stage.addActor(number_5);
         stage.addActor(number_6);
 
+
+
         //stage_win.addActor(WinActor);
-        //stage_lose.addActor(LoseActor);
+        //stage_lose.addActor(Again);
 
         stage_start.addActor(Remembered);
         stage_check.addActor(check);
@@ -404,6 +421,8 @@ public class PlayScreen implements Screen, InputProcessor {
         controll.autoUpdate = true;
         multiplexer.addProcessor(this);
         multiplexer.addProcessor(stage_start);
+        multiplexer.addProcessor(stage_lose);
+
         multiplexer.addProcessor(controll);
 
 
@@ -428,7 +447,7 @@ public class PlayScreen implements Screen, InputProcessor {
             stage.act();
             stage.draw();
         }
-        if(!stage_remembered){
+        if(!stage_remembered && win == 0){
             stage_start.act();
             stage_start.draw();
         }else{
@@ -524,7 +543,7 @@ public class PlayScreen implements Screen, InputProcessor {
                 nodeDone = true;
             }
         }
-        if (count > 1 && nodeDone) {
+        if (count > 0 && nodeDone) {
             closest = nodes.get(0);
             Vector3 boxLocation = new Vector3();
             closest.calculateBoundingBox(box).getCenter(boxLocation);

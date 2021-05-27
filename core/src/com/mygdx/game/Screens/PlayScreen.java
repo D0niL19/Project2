@@ -95,7 +95,7 @@ public class PlayScreen implements Screen, InputProcessor {
     private final Texture number6 = new Texture("numbers/six.png");
     private final Texture remembered = new Texture("Remembered.png");
     private final Texture again = new Texture("refresh.png");
-    private final Texture home = new Texture("home.png");
+    private final Texture home = new Texture("home1.png");
 
     private int number;
 
@@ -239,8 +239,8 @@ public class PlayScreen implements Screen, InputProcessor {
         number_5.setBounds(MainC.WIDTH / 2 - btnSize.x / 2 , MainC.HEIGHT / 9 * 5 - btnSize.y - 20, btnSize.x, btnSize.y);
         number_6.setBounds(MainC.WIDTH / 2 - btnSize.x / 2 + btnSize.x + 20, MainC.HEIGHT / 9 * 5 - btnSize.y - 20, btnSize.x, btnSize.y);
 
-        Home.setBounds(MainC.WIDTH / 3 *2 - btnSize.x / 2, MainC.HEIGHT / 9 * 2, btnSize.x, btnSize.y);
-        Again.setBounds(MainC.WIDTH / 3 - btnSize.x / 2, MainC.HEIGHT / 9 * 2, btnSize.x, btnSize.y);
+        Home.setBounds(MainC.WIDTH / 3 - btnSize.x / 2, MainC.HEIGHT / 9 * 2, btnSize.x, btnSize.y);
+        Again.setBounds(MainC.WIDTH / 3 * 2 - btnSize.x / 2, MainC.HEIGHT / 9 * 2, btnSize.x, btnSize.y);
 
         Remembered.setBounds(MainC.WIDTH / 2 - remembered.getWidth() / 2, 30, remembered.getWidth(), remembered.getHeight());
         check.setBounds(MainC.WIDTH / 2 - btnSize.x / 2, MainC.HEIGHT / 9 * 7, btnSize.x, btnSize.y);
@@ -378,12 +378,15 @@ public class PlayScreen implements Screen, InputProcessor {
 
                 if(win == 1){
                     System.out.println("YES");
+                    stage_win.addActor(Again);
+                    stage_win.addActor(Home);
                 }
                 else if(win == -1){
                     System.out.println("NOOOO!!!");
+                    stage_lose.addActor(Again);
+                    stage_lose.addActor(Home);
                 }
-                stage_lose.addActor(Again);
-                stage_lose.addActor(Home);
+
 
                 super.touchUp(event, x, y, pointer, button);
             }
@@ -540,7 +543,7 @@ public class PlayScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (isDragged || Touched || !stage_remembered) return false;
+        if (isDragged || Touched || !stage_remembered || win == 1 || win == -1) return false;
 
         Ray ray = camera.getPickRay(screenX, screenY);
         count += 1;

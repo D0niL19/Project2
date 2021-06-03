@@ -28,7 +28,7 @@ public class MainC extends Game {
 		mainC = new MainC();
 	}
 
-	private MainC() {
+	MainC() {
 
 	}
 

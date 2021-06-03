@@ -438,6 +438,7 @@ public class PlayScreen implements Screen, InputProcessor {
         multiplexer.addProcessor(this);
         multiplexer.addProcessor(stage_start);
         multiplexer.addProcessor(stage_lose);
+        multiplexer.addProcessor(stage_win);
 
         multiplexer.addProcessor(controll);
 
